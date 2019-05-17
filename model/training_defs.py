@@ -2,8 +2,8 @@ import logging
 import os
 import tensorflow as tf
 from tqdm import trange
-from model.utils import save_dict_to_json
-from model.evaluation import evaluate_sess
+from model.utilities import save_dict_to_json
+from model.evaluation_defs import evaluate_sess
 
 #TODO: UPDATE!
 

@@ -4,8 +4,8 @@ import argparse
 import logging
 import os
 import tensorflow as tf
-from model.input_data import input_fn
-from model.model_setup import model_fn
+from model.input_data import input_def
+from model.model_setup import model_def
 from model.evaluation_defs import evaluate
 from model.utilities import Params
 from model.utilities import set_logger
@@ -48,11 +48,11 @@ if __name__ == '__main__':
     params.eval_size = len(test_filenames)
 
     # create the iterator over the dataset
-    test_inputs = input_fn(False, test_filenames, test_labels, params)
+    test_inputs = input_def(False, test_filenames, test_labels, params)
 
     # Define the model
     logging.info("Creating the model...")
-    model_spec = model_fn('eval', test_inputs, params, reuse=False)
+    model_spec = model_def('eval', test_inputs, params, reuse=False)
 
     logging.info("Starting evaluation")
     evaluate(model_spec, args.model_dir, params, args.restore_from)

@@ -13,11 +13,11 @@ import os
 import random
 import tensorflow as tf
 
-from model.input_data import input_fn
+from model.input_data import input_def
 from model.utilities import Params
 from model.utilities import set_logger
 from model.utilities import save_dict_to_json
-from model.model_setup import model_fn
+from model.model_setup import model_def
 from model.training_defs import train_and_evaluate
 from model.utilities import splitter
 
@@ -71,13 +71,13 @@ if __name__ == '__main__':
     params.eval_size = len(eval_filenames)
 
     # Create the two iterators over the two datasets
-    train_inputs = input_fn(True, train_filenames, train_labels, params)
-    eval_inputs = input_fn(False, eval_filenames, eval_labels, params)
+    train_inputs = input_def(True, train_filenames, train_labels, params)
+    eval_inputs = input_def(False, eval_filenames, eval_labels, params)
 
     # Define the model
     logging.info("Creating the model...")
-    train_model_spec = model_fn('train', train_inputs, params)
-    eval_model_spec = model_fn('eval', eval_inputs, params, reuse=True)
+    train_model_spec = model_def('train', train_inputs, params)
+    eval_model_spec = model_def('eval', eval_inputs, params, reuse=True)
 
     # Train the model
     logging.info("Starting training for {} epoch(s)".format(params.num_epochs))

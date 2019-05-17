@@ -2,8 +2,8 @@ import logging
 import os
 import tensorflow as tf
 from tqdm import trange # not needed?
-from model.utils import save_dict_to_json
-
+from model.utilities import save_dict_to_json
+from model.utilities import splitter
 
 def evaluate_sess(sess, model_spec, num_steps, writer=None, params=None):
     """Train the model on `num_steps` batches.
