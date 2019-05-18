@@ -44,7 +44,11 @@ def resize_and_save(filename, output_dir, size, class_label, pic_number, example
     image = Image.open(filename)
     # Use bilinear interpolation instead of the default "nearest neighbor" method
     image = image.resize((size, size), Image.BILINEAR)
-    image.save(os.path.join(output_dir, str(class_label) + '_' + str(pic_number) + '_' + str(example) + '.jpg'))
+    if len(str(class_label)) == 1:
+        classlabel = '0' + str(class_label)
+    else:
+        classlabel = str(class_label)
+    image.save(os.path.join(output_dir, classlabel + '_' + str(pic_number) + '_' + str(example) + '.jpg'))
 
 def find_data_and_labels(EgoGesture_path, gestures):
     '''
@@ -158,7 +162,13 @@ def get_data_and_save(EgoGesture_path, output_dir, gestures, percent_dev, percen
                     print("Warning: dir {} already exists".format(output_dir_split))
             print("Processing {} data, saving preprocessed data to {}".format(i, output_dir_split))
             for j in range(len(path_images[i])):
-                resize_and_save(path_images[i][j], output_dir_split, SIZE, class_label[i], j, i)
+                if j == 0:
+                    output_dir_split_j = os.path.join(output_dir_split, str(i))
+                    if not os.path.exists(output_dir_split_j):
+                        os.mkdir(output_dir_split_j)
+                    else:
+                        print("Warning: dir {} already exists".format(output_dir_split_j))
+                resize_and_save(path_images[i][j], output_dir_split_j, SIZE, class_label[i], j, i)
         elif i >= m_train and i < m_train+m_dev:
             if i == m_train:
                 output_dir_split = os.path.join(output_dir, tdt_folders[1])
@@ -168,7 +178,13 @@ def get_data_and_save(EgoGesture_path, output_dir, gestures, percent_dev, percen
                     print("Warning: dir {} already exists".format(output_dir_split))
             print("Processing {} data, saving preprocessed data to {}".format(i, output_dir_split))
             for j in range(len(path_images[i])):
-                resize_and_save(path_images[i][j], output_dir_split, SIZE, class_label[i], j, i)
+                if j == 0:
+                    output_dir_split_j = os.path.join(output_dir_split, str(i))
+                    if not os.path.exists(output_dir_split_j):
+                        os.mkdir(output_dir_split_j)
+                    else:
+                        print("Warning: dir {} already exists".format(output_dir_split_j))
+                resize_and_save(path_images[i][j], output_dir_split_j, SIZE, class_label[i], j, i)
         else:
             if i == m_train+m_dev:
                 output_dir_split = os.path.join(output_dir, tdt_folders[2])
@@ -178,7 +194,13 @@ def get_data_and_save(EgoGesture_path, output_dir, gestures, percent_dev, percen
                     print("Warning: dir {} already exists".format(output_dir_split))
             print("Processing {} data, saving preprocessed data to {}".format(i, output_dir_split))
             for j in range(len(path_images[i])):
-                resize_and_save(path_images[i][j], output_dir_split, SIZE, class_label[i], j, i)
+                if j == 0:
+                    output_dir_split_j = os.path.join(output_dir_split, str(i))
+                    if not os.path.exists(output_dir_split_j):
+                        os.mkdir(output_dir_split_j)
+                    else:
+                        print("Warning: dir {} already exists".format(output_dir_split_j))
+                resize_and_save(path_images[i][j], output_dir_split_j, SIZE, class_label[i], j, i)
 
 def get_data_and_stack(EgoGesture_path, gestures, percent_dev, percent_test):
     '''

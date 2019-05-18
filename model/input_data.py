@@ -20,12 +20,14 @@ def _parse_function(filename, label, size):
 
     return resized_image, label
 
-
+# params.train_size = len(train_filenames)/5
+# train_inputs = input_def(True, train_filenames, train_labels, params)
+# eval_inputs = input_def(False, eval_filenames, eval_labels, params)
 def input_def(is_training, filenames, labels, params):
-    """Input function for the SIGNS dataset.
+    """Input function for the EgoGesture dataset.
 
-    The filenames have format "{label}_IMG_{id}.jpg".
-    For instance: "data_dir/2_IMG_4584.jpg".
+    The filenames have format "{class label}_{part number (0-4)}_{total example number}.jpg".
+    For instance: "data_dir/23_2_806.jpg".
 
     Args:
         is_training: (bool) whether to use the train or test pipeline.
@@ -34,20 +36,20 @@ def input_def(is_training, filenames, labels, params):
         labels: (list) corresponding list of labels
         params: (Params) contains hyperparameters of the model (ex: `params.num_epochs`)
     """
-    num_samples = len(filenames)
     assert len(filenames) == len(labels), "Filenames and labels should have same length"
 
     # Create a Dataset serving batches of images and labels
     # We don't repeat for multiple epochs because we always train and evaluate for one epoch
     train_fn = lambda f, l: _parse_function(f, l, params.image_size)
 
+    num_samples = len(filenames)
     if is_training:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
-            #.shuffle(num_samples)  # whole dataset into the buffer ensures good shuffling
             .map(train_fn, num_parallel_calls=params.num_parallel_calls)
             .batch(params.batch_size)
             .prefetch(1)  # make sure you always have one batch ready to serve
         )
+        # .shuffle(num_samples)  # whole dataset into the buffer ensures good shuffling
     else:
         dataset = (tf.data.Dataset.from_tensor_slices((tf.constant(filenames), tf.constant(labels)))
             .map(train_fn)

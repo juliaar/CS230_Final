@@ -1,7 +1,6 @@
 """Train the model"""
 
 # COMMANDS:
-# python build_dataset.py --data_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\data\SIGNS" --output_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\data\64x64_SIGNS"
 # python train.py --data_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\data\64x64_SIGNS" --model_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\experiments\base_model"
 # python search_hyperparams.py --data_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\data\64x64_SIGNS" --parent_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\experiments\learning_rate"
 # python synthesize_results.py --parent_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\experiments\learning_rate"
@@ -23,9 +22,9 @@ from model.utilities import splitter
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model_dir', default='experiments/test',
+parser.add_argument('--model_dir', default='C:\\Users\\Julia Arnardottir\\PycharmProjects\\CS230_Final\experiments\\base_model',
                     help="Experiment directory containing params.json")
-parser.add_argument('--data_dir', default='data/64x64_SIGNS',
+parser.add_argument('--data_dir', default='D:\\CS230-Datasets\\EgoGesture\\64x64_gestures',
                     help="Directory containing the dataset")
 parser.add_argument('--restore_from', default=None,
                     help="Optional, directory or file containing weights to reload before training")
@@ -53,22 +52,38 @@ if __name__ == '__main__':
     # Create the input data pipeline
     logging.info("Creating the datasets...")
     data_dir = args.data_dir
-    train_data_dir = os.path.join(data_dir, "train_signs")
-    dev_data_dir = os.path.join(data_dir, "dev_signs")
+    train_data_dir = os.path.join(data_dir, "train_gestures")
+    dev_data_dir = os.path.join(data_dir, "dev_gestures")
 
     # Get the filenames from the train and dev sets
-    train_filenames = [os.path.join(train_data_dir, f) for f in os.listdir(train_data_dir)
-                       if f.endswith('.jpg')]
-    eval_filenames = [os.path.join(dev_data_dir, f) for f in os.listdir(dev_data_dir)
-                      if f.endswith('.jpg')]
 
-    # Labels will be between 0 and 5 included (6 classes in total)
-    train_labels = [int(f.split(splitter)[-1][0]) for f in train_filenames]
-    eval_labels = [int(f.split(splitter)[-1][0]) for f in eval_filenames]
+    train_filenames = []
+    train_labels = []
+    train_dirs = [x[0] for x in tf.gfile.Walk(train_data_dir)]
+    count = 0
+    for train_dir in train_dirs:
+        # We only want the folders, not images:
+        if '.jog' in train_dir:
+            continue
+        train_filenames[count] = [os.path.join(train_dir, f) for f in os.listdir(train_dir) if f.endswith('.jpg')]
+        train_labels = int(train_filenames[count][1].split(splitter)[-1][:2])
+        count += 1
+
+    eval_filenames = []
+    eval_labels = []
+    eval_dirs = [x[0] for x in tf.gfile.Walk(dev_data_dir)]
+    count = 0
+    for eval_dir in eval_dirs:
+        # We only want the folders, not images:
+        if '.jog' in eval_dir:
+            continue
+        eval_filenames[count] = [os.path.join(eval_dir, f) for f in os.listdir(dev_data_dir) if f.endswith('.jpg')]
+        eval_labels[count] = int(eval_filenames[count][1].split(splitter)[-1][:2])
+        count += 1
 
     # Specify the sizes of the dataset we train on and evaluate on
-    params.train_size = len(train_filenames)
-    params.eval_size = len(eval_filenames)
+    params.train_size = len(train_filenames)/5
+    params.eval_size = len(eval_filenames)/5
 
     # Create the two iterators over the two datasets
     train_inputs = input_def(True, train_filenames, train_labels, params)
