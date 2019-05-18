@@ -8,15 +8,24 @@ def _parse_function(filename, label, size):
         - Decode the image from jpeg format
         - Convert to float and to range [0, 1]
     """
-    image_string = tf.read_file(filename)
 
-    # Don't use tf.image.decode_image, or the output shape will be undefined
-    image_decoded = tf.image.decode_jpeg(image_string, channels=3)
+    for k in range(len(filename)):
 
-    # This will convert to float values in [0, 1]
-    image = tf.image.convert_image_dtype(image_decoded, tf.float32)
+        image_string = tf.read_file(filename)
 
-    resized_image = tf.image.resize_images(image, [size, size])
+        # Don't use tf.image.decode_image, or the output shape will be undefined
+        image_decoded = tf.image.decode_jpeg(image_string, channels=3)
+
+        # This will convert to float values in [0, 1]
+        image = tf.image.convert_image_dtype(image_decoded, tf.float32)
+
+        if k == 0:
+            resized_image = tf.image.resize_images(image, [size, size])
+            print(k)
+        else:
+            re_image_k = tf.image.resize_images(image, [size, size])
+            resized_image = np.dstack((resized_image, re_image_k))
+            print(resized_image)
 
     return resized_image, label
 
@@ -32,7 +41,7 @@ def input_def(is_training, filenames, labels, params):
     Args:
         is_training: (bool) whether to use the train or test pipeline.
                      At training, we shuffle the data and have multiple epochs
-        filenames: (list) filenames of the images, as ["data_dir/{label}_IMG_{id}.jpg"...]
+        filenames: (list) filenames of the images (5 images together)
         labels: (list) corresponding list of labels
         params: (Params) contains hyperparameters of the model (ex: `params.num_epochs`)
     """

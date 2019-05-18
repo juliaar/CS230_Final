@@ -6,6 +6,8 @@
 # python synthesize_results.py --parent_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\experiments\learning_rate"
 # python evaluate.py --data_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\data\64x64_SIGNS" --model_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\experiments\base_model"
 
+#python train_model.py --data_dir "D:\CS230-Datasets\EgoGesture\\64x64_gestures" --model_dir "C:\Users\Julia Arnardottir\PycharmProjects\CS230_Final\experiments\\base_model"
+
 import argparse
 import logging
 import os
@@ -62,11 +64,13 @@ if __name__ == '__main__':
     train_dirs = [x[0] for x in tf.gfile.Walk(train_data_dir)]
     count = 0
     for train_dir in train_dirs:
-        # We only want the folders, not images:
-        if '.jog' in train_dir:
+        # We only want the subfolders, not images:
+        if train_dir in train_data_dir:
             continue
-        train_filenames[count] = [os.path.join(train_dir, f) for f in os.listdir(train_dir) if f.endswith('.jpg')]
-        train_labels = int(train_filenames[count][1].split(splitter)[-1][:2])
+        if '.jpg' in train_dir:
+            continue
+        train_filenames.append([os.path.join(train_dir, f) for f in os.listdir(train_dir) if f.endswith('.jpg')])
+        train_labels.append(int(train_filenames[count][1].split(splitter)[-1][:2]))
         count += 1
 
     eval_filenames = []
@@ -74,16 +78,18 @@ if __name__ == '__main__':
     eval_dirs = [x[0] for x in tf.gfile.Walk(dev_data_dir)]
     count = 0
     for eval_dir in eval_dirs:
-        # We only want the folders, not images:
-        if '.jog' in eval_dir:
+        # We only want the subfolders, not images:
+        if eval_dir in eval_dirs:
             continue
-        eval_filenames[count] = [os.path.join(eval_dir, f) for f in os.listdir(dev_data_dir) if f.endswith('.jpg')]
-        eval_labels[count] = int(eval_filenames[count][1].split(splitter)[-1][:2])
+        if '.jpg' in eval_dir:
+            continue
+        eval_filenames.append([os.path.join(eval_dir, f) for f in os.listdir(dev_data_dir) if f.endswith('.jpg')])
+        eval_labels.append(int(eval_filenames[count][1].split(splitter)[-1][:2]))
         count += 1
 
     # Specify the sizes of the dataset we train on and evaluate on
-    params.train_size = len(train_filenames)/5
-    params.eval_size = len(eval_filenames)/5
+    params.train_size = len(train_filenames)
+    params.eval_size = len(eval_filenames)
 
     # Create the two iterators over the two datasets
     train_inputs = input_def(True, train_filenames, train_labels, params)
