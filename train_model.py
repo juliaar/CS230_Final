@@ -67,8 +67,6 @@ if __name__ == '__main__':
         # We only want the subfolders, not images:
         if train_dir in train_data_dir:
             continue
-        if '.jpg' in train_dir:
-            continue
         train_filenames.append([os.path.join(train_dir, f) for f in os.listdir(train_dir) if f.endswith('.jpg')])
         train_labels.append(int(train_filenames[count][1].split(splitter)[-1][:2]))
         count += 1
@@ -79,9 +77,7 @@ if __name__ == '__main__':
     count = 0
     for eval_dir in eval_dirs:
         # We only want the subfolders, not images:
-        if eval_dir in eval_dirs:
-            continue
-        if '.jpg' in eval_dir:
+        if eval_dir in dev_data_dir:
             continue
         eval_filenames.append([os.path.join(eval_dir, f) for f in os.listdir(eval_dir) if f.endswith('.jpg')])
         eval_labels.append(int(eval_filenames[count][1].split(splitter)[-1][:2]))
