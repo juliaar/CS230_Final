@@ -43,7 +43,7 @@ if __name__ == '__main__':
     params = Params(json_path)
 
     # Check that we are not overwriting some previous experiment
-    # Comment these lines if you are developing your model and don't care about overwritting
+    # Comment these lines if you are developing your model and don't care about overwriting
     model_dir_has_best_weights = os.path.isdir(os.path.join(args.model_dir, "best_weights"))
     overwritting = model_dir_has_best_weights and args.restore_from is None
     assert not overwritting, "Weights found in model_dir, aborting to avoid overwrite"

@@ -1,5 +1,7 @@
 import tensorflow as tf
-
+from keras import backend as K
+from keras.layers import Conv2D, MaxPooling2D, BatchNormalization
+from keras.layers.core import Dense
 
 def build_model(is_training, inputs, params):
     """Compute logits of the model (output distribution)
@@ -14,8 +16,9 @@ def build_model(is_training, inputs, params):
         output: (tf.Tensor) output of the model
     """
     images = inputs['images']
-
-    assert images.get_shape().as_list() == [None, params.image_size, params.image_size, 3]
+    print(images.shape)
+    assert images.get_shape().as_list() == [None, params.image_size, params.image_size, 15]
+    print('first assert over')
 
     out = images
     # Define the number of channels of each convolution
@@ -26,21 +29,27 @@ def build_model(is_training, inputs, params):
     for i, c in enumerate(channels):
         with tf.variable_scope('block_{}'.format(i+1)):
             out = tf.layers.conv2d(out, c, 3, padding='same')
+            #out = Conv2D(c, (3, 3), padding='same')(out)
             if params.use_batch_norm:
                 out = tf.layers.batch_normalization(out, momentum=bn_momentum, training=is_training)
+                #out = BatchNormalization(momentum=bn_momentum, training=is_training)(out)
             out = tf.nn.relu(out)
             out = tf.layers.max_pooling2d(out, 2, 2)
+            #out = MaxPooling2D(pool_size=(2, 2))(out)
 
     assert out.get_shape().as_list() == [None, 4, 4, num_channels * 8]
 
     out = tf.reshape(out, [-1, 4 * 4 * num_channels * 8])
     with tf.variable_scope('fc_1'):
         out = tf.layers.dense(out, num_channels * 8)
+        #out = Dense(num_channels * 8)(out)
         if params.use_batch_norm:
             out = tf.layers.batch_normalization(out, momentum=bn_momentum, training=is_training)
+            #out = BatchNormalization(momentum=bn_momentum, training=is_training)(out)
         out = tf.nn.relu(out)
     with tf.variable_scope('fc_2'):
         logits = tf.layers.dense(out, params.num_labels)
+        #logits = Dense(params.num_labels)(out)
 
     return logits
 
@@ -62,16 +71,19 @@ def model_def(mode, inputs, params, reuse=False):
     labels = tf.cast(labels, tf.int64)
 
     # -----------------------------------------------------------
+    print('Defining layers of the model.')
     # MODEL: define the layers of the model
     with tf.variable_scope('model', reuse=reuse):
         # Compute the output distribution of the model and the predictions
         logits = build_model(is_training, inputs, params)
         predictions = tf.argmax(logits, 1)
 
+    print('Defining loss and accuracy.')
     # Define loss and accuracy
     loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
     accuracy = tf.reduce_mean(tf.cast(tf.equal(labels, predictions), tf.float32))
 
+    print('Defining training step that minimizes loss with the Adam optimizer.')
     # Define training step that minimizes the loss with the Adam optimizer
     if is_training:
         optimizer = tf.train.AdamOptimizer(params.learning_rate)
