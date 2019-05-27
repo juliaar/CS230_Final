@@ -91,13 +91,6 @@ if __name__ == '__main__':
     train_inputs = input_def(True, train_filenames, train_labels, params)
     eval_inputs = input_def(False, eval_filenames, eval_labels, params)
 
-    print(train_inputs['labels'])
-    print(eval_inputs['labels'])
-    # ~~~~~~~~~~~ WHY DIFFERENT DATA TYPES??
-    #Tensor("IteratorGetNext:1", shape=(?,), dtype=int32)
-    #Tensor("IteratorGetNext_1:1", shape=(?,), dtype=float32)
-
-
     # Define the model
     logging.info("Creating the model...")
     train_model_spec = model_def('train', train_inputs, params)
