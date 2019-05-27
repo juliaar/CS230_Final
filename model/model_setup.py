@@ -16,9 +16,7 @@ def build_model(is_training, inputs, params):
         output: (tf.Tensor) output of the model
     """
     images = inputs['images']
-    print(images.shape)
     assert images.get_shape().as_list() == [None, params.image_size, params.image_size, 15]
-    print('first assert over')
 
     out = images
     # Define the number of channels of each convolution
@@ -71,19 +69,16 @@ def model_def(mode, inputs, params, reuse=False):
     labels = tf.cast(labels, tf.int64)
 
     # -----------------------------------------------------------
-    print('Defining layers of the model.')
     # MODEL: define the layers of the model
     with tf.variable_scope('model', reuse=reuse):
         # Compute the output distribution of the model and the predictions
         logits = build_model(is_training, inputs, params)
         predictions = tf.argmax(logits, 1)
 
-    print('Defining loss and accuracy.')
     # Define loss and accuracy
     loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
     accuracy = tf.reduce_mean(tf.cast(tf.equal(labels, predictions), tf.float32))
 
-    print('Defining training step that minimizes loss with the Adam optimizer.')
     # Define training step that minimizes the loss with the Adam optimizer
     if is_training:
         optimizer = tf.train.AdamOptimizer(params.learning_rate)
