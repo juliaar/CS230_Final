@@ -83,7 +83,7 @@ if __name__ == '__main__':
             continue
         if '.jpg' in eval_dir:
             continue
-        eval_filenames.append([os.path.join(eval_dir, f) for f in os.listdir(dev_data_dir) if f.endswith('.jpg')])
+        eval_filenames.append([os.path.join(eval_dir, f) for f in os.listdir(eval_dir) if f.endswith('.jpg')])
         eval_labels.append(int(eval_filenames[count][1].split(splitter)[-1][:2]))
         count += 1
 
