@@ -68,7 +68,10 @@ def model_def(mode, inputs, params, reuse=False):
     """
     is_training = (mode == 'train')
     labels = inputs['labels']
+    print('~~~~~~~~~~~~~   print to check!!!')
+    print(labels)
     labels = tf.cast(labels, tf.int64)
+    print(labels)
 
     # -----------------------------------------------------------
     print('Defining layers of the model.')
@@ -81,6 +84,8 @@ def model_def(mode, inputs, params, reuse=False):
     print('Defining loss and accuracy.')
     # Define loss and accuracy
     loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
+    print('LOSS IS ~~~~~~~~~~~~~~')
+    print(loss)
     accuracy = tf.reduce_mean(tf.cast(tf.equal(labels, predictions), tf.float32))
 
     print('Defining training step that minimizes loss with the Adam optimizer.')
