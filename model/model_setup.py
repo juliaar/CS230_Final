@@ -134,7 +134,7 @@ def model_def(mode, inputs, params, reuse=False):
     model_spec['metrics_init_op'] = metrics_init_op
     model_spec['metrics'] = metrics
     model_spec['update_metrics'] = update_metrics_op
-    model_spec['summary_op'] = tf.summary.merge_all()
+    #model_spec['summary_op'] = tf.summary.merge_all()
 
     if is_training:
         model_spec['train_op'] = train_op

@@ -1,0 +1,6 @@
+model_checkpoint_path: "C:\\Users\\Julia Arnardottir\\PycharmProjects\\CS230_Final\\experiments\\\\base_model\\last_weights\\after-epoch-12"
+all_model_checkpoint_paths: "C:\\Users\\Julia Arnardottir\\PycharmProjects\\CS230_Final\\experiments\\\\base_model\\last_weights\\after-epoch-8"
+all_model_checkpoint_paths: "C:\\Users\\Julia Arnardottir\\PycharmProjects\\CS230_Final\\experiments\\\\base_model\\last_weights\\after-epoch-9"
+all_model_checkpoint_paths: "C:\\Users\\Julia Arnardottir\\PycharmProjects\\CS230_Final\\experiments\\\\base_model\\last_weights\\after-epoch-10"
+all_model_checkpoint_paths: "C:\\Users\\Julia Arnardottir\\PycharmProjects\\CS230_Final\\experiments\\\\base_model\\last_weights\\after-epoch-11"
+all_model_checkpoint_paths: "C:\\Users\\Julia Arnardottir\\PycharmProjects\\CS230_Final\\experiments\\\\base_model\\last_weights\\after-epoch-12"
