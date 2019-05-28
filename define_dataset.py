@@ -1,6 +1,6 @@
-'''To call:
-python define_dataset.py --data_dir "D:\CS230-Datasets\EgoGesture" --output_dir "D:\CS230-Datasets\EgoGesture\64x64_gestures"
-'''
+''' To call: '''
+#python define_dataset.py --data_dir "D:\CS230-Datasets\EgoGesture" --output_dir "D:\CS230-Datasets\EgoGesture\64x64_gestures"
+
 
 import argparse
 import os

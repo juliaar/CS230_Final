@@ -1,10 +1,11 @@
+# python display_results.py --parent_dir "C:\Users\Julia Arnardottir\PycharmProjects\CS230_Final\experiments\learning_rate"
+
+
 import argparse
 import json
 import os
 
 from tabulate import tabulate
-
-# TODO: update this
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--parent_dir', default='experiments',

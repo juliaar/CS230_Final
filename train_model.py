@@ -1,12 +1,6 @@
-"""Train the model"""
-
-# COMMANDS:
-# python train.py --data_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\data\64x64_SIGNS" --model_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\experiments\base_model"
-# python search_hyperparams.py --data_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\data\64x64_SIGNS" --parent_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\experiments\learning_rate"
-# python synthesize_results.py --parent_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\experiments\learning_rate"
-# python evaluate.py --data_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\data\64x64_SIGNS" --model_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\experiments\base_model"
-
+''' To call (Train the model): '''
 #python train_model.py --data_dir "D:\CS230-Datasets\EgoGesture\\64x64_gestures" --model_dir "C:\Users\Julia Arnardottir\PycharmProjects\CS230_Final\experiments\\base_model"
+
 
 import argparse
 import logging
@@ -44,10 +38,11 @@ if __name__ == '__main__':
 
     # Check that we are not overwriting some previous experiment
     # Comment these lines if you are developing your model and don't care about overwriting
+    '''
     model_dir_has_best_weights = os.path.isdir(os.path.join(args.model_dir, "best_weights"))
     overwritting = model_dir_has_best_weights and args.restore_from is None
     assert not overwritting, "Weights found in model_dir, aborting to avoid overwrite"
-
+    '''
     # Set the logger
     set_logger(os.path.join(args.model_dir, 'train.log'))
 
