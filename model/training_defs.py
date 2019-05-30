@@ -22,7 +22,7 @@ def train_sess(sess, model_spec, num_steps, writer, params):
     train_op = model_spec['train_op']
     update_metrics = model_spec['update_metrics']
     metrics = model_spec['metrics']
-    #summary_op = model_spec['summary_op']
+    summary_op = model_spec['summary_op']
     global_step = tf.train.get_global_step()
 
     # Load the training dataset into the pipeline and initialize the metrics local variables
@@ -36,13 +36,13 @@ def train_sess(sess, model_spec, num_steps, writer, params):
         if i % params.save_summary_steps == 0:
             print('~~ Perform a mini-batch update ~')
             # Perform a mini-batch update
-            #_, _, loss_val, summ, global_step_val = sess.run([train_op, update_metrics, loss,
-            #                                                  summary_op, global_step])
-            _, _, loss_val, global_step_val = sess.run([train_op, update_metrics, loss, global_step])
+            _, _, loss_val, summ, global_step_val = sess.run([train_op, update_metrics, loss,
+                                                              summary_op, global_step])
+            #_, _, loss_val, global_step_val = sess.run([train_op, update_metrics, loss, summary_op, global_step])
 
             print('Write summaries for tensorboard')
             # Write summaries for tensorboard
-            #writer.add_summary(summ, global_step_val)
+            writer.add_summary(summ, global_step_val)
             #writer.add_summary(global_step_val)
         else:
             _, _, loss_val = sess.run([train_op, update_metrics, loss])
@@ -84,6 +84,7 @@ def train_and_evaluate(train_model_spec, eval_model_spec, model_dir, params, res
                 begin_at_epoch = int(restore_from.split('-')[-1])
             last_saver.restore(sess, restore_from)
 
+        print(os.path.join(model_dir, 'train_summaries'))
         # For tensorboard (takes care of writing summaries to files)
         train_writer = tf.summary.FileWriter(os.path.join(model_dir, 'train_summaries'), sess.graph)
         eval_writer = tf.summary.FileWriter(os.path.join(model_dir, 'eval_summaries'), sess.graph)
@@ -94,7 +95,6 @@ def train_and_evaluate(train_model_spec, eval_model_spec, model_dir, params, res
             logging.info("Epoch {}/{}".format(epoch + 1, begin_at_epoch + params.num_epochs))
             # Compute number of batches in one epoch (one full pass over the training set)
             num_steps = (params.train_size + params.batch_size - 1) // params.batch_size
-            print('train_sess starting to run')
             train_sess(sess, train_model_spec, num_steps, train_writer, params)
 
             print('save weights')

@@ -107,10 +107,11 @@ def model_def(mode, inputs, params, reuse=False):
     metric_variables = tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope="metrics")
     metrics_init_op = tf.variables_initializer(metric_variables)
 
+    im1, im2, im3, im4, im5 = tf.split(inputs['images'], num_or_size_splits=5, axis=3)
     # Summaries for training
     tf.summary.scalar('loss', loss)
     tf.summary.scalar('accuracy', accuracy)
-    tf.summary.image('train_image', inputs['images'])
+    tf.summary.image('train_image', im3)
 
     #TODO: if mode == 'eval': ?
     # Add incorrectly labeled images
@@ -119,7 +120,7 @@ def model_def(mode, inputs, params, reuse=False):
     # Add a different summary to know how they were misclassified
     for label in range(0, params.num_labels):
         mask_label = tf.logical_and(mask, tf.equal(predictions, label))
-        incorrect_image_label = tf.boolean_mask(inputs['images'], mask_label)
+        incorrect_image_label = tf.boolean_mask(im3, mask_label)
         tf.summary.image('incorrectly_labeled_{}'.format(label), incorrect_image_label)
 
     # -----------------------------------------------------------
@@ -134,7 +135,7 @@ def model_def(mode, inputs, params, reuse=False):
     model_spec['metrics_init_op'] = metrics_init_op
     model_spec['metrics'] = metrics
     model_spec['update_metrics'] = update_metrics_op
-    #model_spec['summary_op'] = tf.summary.merge_all()
+    model_spec['summary_op'] = tf.summary.merge_all()
 
     if is_training:
         model_spec['train_op'] = train_op

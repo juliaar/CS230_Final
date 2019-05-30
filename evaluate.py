@@ -19,7 +19,6 @@ parser.add_argument('--data_dir', default='data/64x64_SIGNS',
 parser.add_argument('--restore_from', default='best_weights',
                     help="Subdirectory of model dir or file containing the weights")
 
-# TODO: update thiiiiiis
 if __name__ == '__main__':
     # Set the random seed for the whole graph
     tf.set_random_seed(230)
