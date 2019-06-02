@@ -1,13 +1,18 @@
-# python connect_webcam.py
+# python start_run.py
 
 import cv2
 import os
+from PIL import Image
 
 def getFrame(count):
-  # vidcap.set(cv2.CAP_PROP_POS_MSEC, sec*1000)
+  size = 64
   hasFrames, image = vidcap.read()
+  name = "frame" + str(count) + ".jpg"
   if hasFrames:
-    cv2.imwrite("frame" + str(count) + ".jpg", image)  # save frame as JPG file
+    cv2.imwrite(name, image)  # save frame as JPG file
+  smallimage = Image.open(name)
+  smallimage = smallimage.resize((size, size), Image.BILINEAR)
+  smallimage.save(name)
   return hasFrames
 
 def remove_img(number):
@@ -15,10 +20,10 @@ def remove_img(number):
   os.remove(img_name)
   return True
 
-
 vidcap = cv2.VideoCapture(0)
 # automatically captures 30 fps (we want to show those but only save 3 fps)
-#print(vidcap.get(cv2.CAP_PROP_FPS))
+# print(vidcap.get(cv2.CAP_PROP_FPS))
+
 totcount = 0
 count = 0
 

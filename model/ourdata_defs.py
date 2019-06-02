@@ -38,6 +38,7 @@ X_train, Y_train, C_train = train_set
 print(X_train[0].shape) # print the shape of the first training example to check
 '''
 
+# Used in get_data_and_save (def)
 def resize_and_save(filename, output_dir, size, class_label, pic_number, example):
     """Resize the image contained in `filename` and save it to the `output_dir`
     Resizing to (64, 64) so it takes less space"""
@@ -50,6 +51,7 @@ def resize_and_save(filename, output_dir, size, class_label, pic_number, example
         classlabel = str(class_label)
     image.save(os.path.join(output_dir, classlabel + '_' + str(pic_number) + '_' + str(example) + '.jpg'))
 
+# Used in get_data_and_save (def)
 def find_data_and_labels(EgoGesture_path, gestures):
     '''
         Inputs:
@@ -91,6 +93,7 @@ def find_data_and_labels(EgoGesture_path, gestures):
     #
     return yc, path_images, class_label
 
+# Used in create_pic_path (def)
 def pick_5_images(data_i, j):
     c_start = data_i[1][j]
     c_end = data_i[2][j]
@@ -114,6 +117,7 @@ def pick_5_images(data_i, j):
     #
     return pic_files
 
+# Used in find_data_and_labels (def)
 def create_pic_path(path_images_start, path_group, data_i, j):
     path_num = [float(s) for s in re.findall(r'-?\d+\.?\d*', path_group)]
     group_num = int(path_num[len(path_num)-1])
@@ -132,12 +136,14 @@ def create_pic_path(path_images_start, path_group, data_i, j):
     #
     return path_images
 
+# Used in get_data_and_save (def)
 def split_data_into_sets(m, percent_dev, percent_test):
     m_dev = int(round(m*percent_dev/100))
     m_test = int(round(m*percent_test/100))
     m_train = m - m_dev - m_test
     return m_train, m_dev, m_test
 
+# Used in model_setup.py
 def get_data_and_save(EgoGesture_path, output_dir, gestures, percent_dev, percent_test, SIZE):
     '''
         Inputs:
@@ -202,6 +208,7 @@ def get_data_and_save(EgoGesture_path, output_dir, gestures, percent_dev, percen
                         print("Warning: dir {} already exists".format(output_dir_split_j))
                 resize_and_save(path_images[i][j], output_dir_split_j, SIZE, class_label[i], j, i)
 
+# Not used
 def get_data_and_stack(EgoGesture_path, gestures, percent_dev, percent_test):
     '''
         Inputs:
