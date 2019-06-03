@@ -101,7 +101,7 @@ if __name__ == '__main__':
             # Stack and run through the model to get prediction:
             prediction = sample_def(files, params)
             r = tf.rank(prediction)
-            print(r)
+            print(prediction)
             #sess = tf.Session()
             #print(sess.run(prediction))
             # Prepare for the next run through

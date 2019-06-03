@@ -1,12 +1,8 @@
-import cv2
-import os
 from keras import backend as K
-import numpy as np
-from PIL import Image
 import tensorflow as tf
 from model.model_setup import build_model
 
-# Stack and Classify
+# Stack and predict class
 
 def _stackimages(files, params):
     # Run through the frames:
@@ -36,15 +32,13 @@ def sample_def(files, params):
     iterator = sample_data.make_initializable_iterator()
     images, labels = iterator.get_next()
     input = {'images': images}
-    print("images after dataset")
-    print(images)
 
-    with tf.variable_scope('model', reuse=False):
+    # reuse = False or True or tf.AUTO_REUSE
+    with tf.variable_scope('model', reuse=tf.AUTO_REUSE):
         # Compute the output distribution of the model and the predictions
         logit = build_model(False, input, params)
         prediction = tf.argmax(logit, 1)
 
-    print("got to the end!")
     return prediction
 
 
