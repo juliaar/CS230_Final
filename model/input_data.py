@@ -32,7 +32,6 @@ def _parse_function(filename, label, size):
     # outputs resizes image with shape (64,64,15) & its label
     return resized_image, label
 
-# params.train_size = len(train_filenames)/5
 # train_inputs = input_def(True, train_filenames, train_labels, params)
 # eval_inputs = input_def(False, eval_filenames, eval_labels, params)
 def input_def(is_training, filenames, labels, params):
