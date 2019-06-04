@@ -46,6 +46,7 @@ if __name__ == '__main__':
     json_path = os.path.join(args.model_dir, 'params.json')
     assert os.path.isfile(json_path), "No json configuration file found at {}".format(json_path)
     params = Params(json_path)
+    params.num_labels = 84
 
     # Set the logger
     set_logger(os.path.join(args.model_dir, 'classify.log'))
@@ -100,23 +101,9 @@ if __name__ == '__main__':
 
         if (totcount % 10) == 0:
             files = [f for f in os.listdir('.') if f.endswith('.jpg')]
-            print(files)
-            # Stack and run through the model to get prediction:
-            # train_inputs = input_def(True, train_filenames, train_labels, params)
-            inputs = tf.placeholder(shape=[None, 64, 64, 3], dtype=tf.float32)
-            prediction = model_def('eval', inputs, params)# sample_def(files, params)
-            assert False
-            # saver = tf.train.Saver()
-            sess = tf.Session()
-            # saver.restore(sess, 'experiments/base_model/best_weights/after-epoch-12')
-            iterator, prediction, labels = sample_def(files, params)
-            init = tf.global_variables_initializer()
-            sess.run(init)
-            sess.run(iterator.initializer)
-            # r = tf.rank(prediction)
-            print(sess.run(prediction, feed_dict={labels: [[0]]}))
-            #
-            # print(sess.run(prediction))
+            prediction = sample_def(files, params)
+            print("prediction:")
+            print(prediction)
             # Prepare for the next run through
             count = count + 1
             # Only want to store 5 images

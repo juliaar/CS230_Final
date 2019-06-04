@@ -26,11 +26,10 @@ def sample_def(files, params):
     '''
 
     stacked_images = _stackimages(files, params)
-    labels = K.placeholder(shape=(None, 1))
     stacked_images = stacked_images[None, :, :, :]
-    sample_data = tf.data.Dataset.from_tensor_slices((stacked_images, labels)).batch(1).prefetch(1)
+    sample_data = tf.data.Dataset.from_tensor_slices((stacked_images)).batch(1).prefetch(1)
     iterator = sample_data.make_initializable_iterator()
-    images, labels = iterator.get_next()
+    images = iterator.get_next()
     input = {'images': images}
 
     # reuse = False or True or tf.AUTO_REUSE
@@ -39,6 +38,16 @@ def sample_def(files, params):
         logit = build_model(False, input, params)
         prediction = tf.argmax(logit, 1)
 
-    return iterator, prediction, labels
+    saver = tf.train.Saver()
+
+    with tf.Session() as sess:
+        # Get the latest checkpoint in the directory
+        restore_from = tf.train.latest_checkpoint("experiments/base_model/best_weights")
+        # Reload the weights into the variables of the graph
+        saver.restore(sess, restore_from)
+        sess.run(iterator.initializer)
+        pred = sess.run(prediction)
+
+    return pred
 
 
