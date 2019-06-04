@@ -9,7 +9,7 @@ import argparse
 
 def RNN_def(x, weights, biases, n_timesteps, n_hidden, n_layers, training):
 
-    # Unstack to get a list of 'n_steps' tensors of shape (batch_size, n_input)
+    # Unstack to get a list of 'n_timesteps' tensors of shape (batch_size, n_input)
     x = tf.unstack(x, n_timesteps, 1)
 
     # Defining a rnn-lstm cell with tensorflow
@@ -25,8 +25,8 @@ def RNN_def(x, weights, biases, n_timesteps, n_hidden, n_layers, training):
     return tf.matmul(outputs[-1], weights['out']) + biases['out']
 
 
-def RNN_model(params, path):
-    # path: path of data files
+def RNN_model(params, train_inputs, eval_inputs):
+    # Where: inputs = {'images': images, 'labels': labels, 'iterator_init_op': iterator_init_op}
 
     # Parameters
     n_classes = params.num_labels
@@ -62,9 +62,14 @@ def RNN_model(params, path):
     # Initializing the variables
     init = tf.global_variables_initializer()
 
+    # train_inputs, eval_inputs
+    # inputs = {'images': images, 'labels': labels, 'iterator_init_op': iterator_init_op}
+
     # Training Variables
-    data = np.load('train_data.npy')
-    label_y = []
+    data = train_inputs['images']
+    print(data)
+    label_y = train_inputs['labels']
+    print(label_y)
     data_x = []
     # TODO: update following
     one = 0
@@ -73,7 +78,7 @@ def RNN_model(params, path):
     four = 0
 
     # Testing Variables
-    test_data = np.load('test_data.npy')
+    test_data = eval_inputs['images']
     test_x = []
     test_label = []
     n_test = 120 # TODO: update as len(test_data)
