@@ -39,6 +39,6 @@ def sample_def(files, params):
         logit = build_model(False, input, params)
         prediction = tf.argmax(logit, 1)
 
-    return prediction
+    return iterator, prediction, labels
 
 

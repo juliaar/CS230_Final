@@ -6,8 +6,10 @@ import argparse
 import logging
 import tensorflow as tf
 from PIL import Image
+from model.model_setup import model_def
 from model.utilities import Params
 from model.utilities import set_logger
+from model.model_setup import build_model
 from classification_defs import sample_def
 
 parser = argparse.ArgumentParser()
@@ -85,6 +87,7 @@ if __name__ == '__main__':
 
     logging.info("Starting classification...")
     # continue, and overwrite the 5 images one at a time
+
     while True:
         # Capture frame-by-frame
         ret, frame = vidcap.read()
@@ -99,11 +102,21 @@ if __name__ == '__main__':
             files = [f for f in os.listdir('.') if f.endswith('.jpg')]
             print(files)
             # Stack and run through the model to get prediction:
-            prediction = sample_def(files, params)
-            r = tf.rank(prediction)
-            print(prediction)
-            #sess = tf.Session()
-            #print(sess.run(prediction))
+            # train_inputs = input_def(True, train_filenames, train_labels, params)
+            inputs = tf.placeholder(shape=[None, 64, 64, 3], dtype=tf.float32)
+            prediction = model_def('eval', inputs, params)# sample_def(files, params)
+            assert False
+            # saver = tf.train.Saver()
+            sess = tf.Session()
+            # saver.restore(sess, 'experiments/base_model/best_weights/after-epoch-12')
+            iterator, prediction, labels = sample_def(files, params)
+            init = tf.global_variables_initializer()
+            sess.run(init)
+            sess.run(iterator.initializer)
+            # r = tf.rank(prediction)
+            print(sess.run(prediction, feed_dict={labels: [[0]]}))
+            #
+            # print(sess.run(prediction))
             # Prepare for the next run through
             count = count + 1
             # Only want to store 5 images

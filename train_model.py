@@ -61,7 +61,7 @@ if __name__ == '__main__':
     train_dirs = [x[0] for x in tf.gfile.Walk(train_data_dir)]
     count = 0
     for train_dir in train_dirs:
-        # We only want the subfolders, not images:
+        # We only want the subfolders:
         if train_dir in train_data_dir:
             continue
         train_filenames.append([os.path.join(train_dir, f) for f in os.listdir(train_dir) if f.endswith('.jpg')])
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     eval_dirs = [x[0] for x in tf.gfile.Walk(dev_data_dir)]
     count = 0
     for eval_dir in eval_dirs:
-        # We only want the subfolders, not images:
+        # We only want the subfolders:
         if eval_dir in dev_data_dir:
             continue
         eval_filenames.append([os.path.join(eval_dir, f) for f in os.listdir(eval_dir) if f.endswith('.jpg')])

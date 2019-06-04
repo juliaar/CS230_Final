@@ -76,14 +76,8 @@ if __name__ == '__main__':
     params.train_size = len(train_filenames)
     params.eval_size = len(eval_filenames)
 
-    # Create the two iterators over the two datasets
-    train_inputs = input_def(True, train_filenames, train_labels, params)
-    eval_inputs = input_def(False, eval_filenames, eval_labels, params)
-    # where inputs = {'images': images, 'labels': labels, 'iterator_init_op': iterator_init_op}
-    # with images decoded, resized and concated
-
     # Define the model
     logging.info("Creating and evaluating the RNN model...")
-    RNN_model(params, train_inputs, eval_inputs)
+    RNN_model(params, train_filenames, train_labels, eval_filenames, eval_labels)
 
 

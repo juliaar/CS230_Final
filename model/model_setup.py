@@ -104,8 +104,6 @@ def model_def(mode, inputs, params, reuse=False):
     tf.summary.scalar('accuracy', accuracy)
     tf.summary.image('train_image', im3)
 
-    #TODO: if mode == 'eval': ?
-    # Add incorrectly labeled images
     mask = tf.not_equal(labels, predictions)
 
     # Add a different summary to know how they were misclassified

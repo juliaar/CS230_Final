@@ -4,8 +4,52 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.contrib import rnn
 import argparse
+import cv2
+import tensorflow as tf
+import numpy as np
 
+def _parse_function(filename):
+    """ Obtain the image from the filename. """
 
+    for k in range(len(filename)):
+
+        # Read image in BGR format
+        image = cv2.imread(filename[k])
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # BGR -> RGB
+
+        if k == 0:
+            resized_image = image.flatten()
+            print(resized_image)
+            print(resized_image.shape)
+        else:
+            resized_image_k = image.flatten()
+            resized_image = tf.stack([resized_image, resized_image_k])
+
+    # outputs resizes image with shape (64,64,15) & its label
+    return resized_image
+
+def _input_def(filenames, labels, size):
+    """Input function for the EgoGesture dataset.
+
+    The filenames have format "{class label}_{part number (0-4)}_{total example number}.jpg".
+    For instance: "data_dir/23_2_806.jpg".
+
+    Args:
+        is_training: (bool) whether to use the train or test pipeline.
+                     At training, we shuffle the data and have multiple epochs
+        filenames: (list) filenames of the images (5 images together)
+        labels: (list) corresponding list of labels
+        params: (Params) contains hyperparameters of the model (ex: `params.num_epochs`)
+    """
+
+    assert len(filenames) == len(labels), "Filenames and labels should have same length"
+
+    images = []
+    for i in range(len(filenames)):
+        im_i, _ = _parse_function(filenames[i], size)
+        images.append(im_i)
+
+    return images
 
 def RNN_def(x, weights, biases, n_timesteps, n_hidden, n_layers, training):
 
@@ -24,19 +68,23 @@ def RNN_def(x, weights, biases, n_timesteps, n_hidden, n_layers, training):
     # Linear activation, using rnn inner loop last output
     return tf.matmul(outputs[-1], weights['out']) + biases['out']
 
+def RNN_model(params, train_filenames, train_labels, eval_filenames, eval_labels):
 
-def RNN_model(params, train_inputs, eval_inputs):
-    # Where: inputs = {'images': images, 'labels': labels, 'iterator_init_op': iterator_init_op}
+    print("Decoding images ...")
+    train_img = _input_def(train_filenames, train_labels, params.image_size)
+    eval_img = _input_def(eval_filenames, eval_labels, params.image_size)
 
     # Parameters
     n_classes = params.num_labels
     learning_rate = params.learning_rate
     training_iters = params.training_iterations
-    n_input = params.num_input  # data is (img feature shape : 625 descriptors * 40 frames)
-    n_timesteps = params.num_timesteps  # timesteps = frames
     batch_size = params.batch_size
     n_layers = params.num_layers  # number of LSTM layers
     n_hidden = params.num_hidden  # number of hidden layers / cells in each LSTM layer
+
+    # TODO: UPDATE
+    n_input = params.num_input  # data is (img feature shape : 625 descriptors * 40 frames)
+    n_timesteps = params.num_timesteps  # timesteps = frames
 
     # tf Graph input
     x = tf.placeholder("float", [None, n_timesteps, n_input])
@@ -46,6 +94,7 @@ def RNN_model(params, train_inputs, eval_inputs):
     weights = {'out': tf.Variable(tf.random_normal([n_hidden, n_classes]))}
     biases = {'out': tf.Variable(tf.random_normal([n_classes]))}
 
+    print("Starting to run RNN ...")
     prediction = RNN_def(x, weights, biases, n_timesteps, n_hidden, n_layers, True)
 
     # Defining loss and optimizer
@@ -66,9 +115,9 @@ def RNN_model(params, train_inputs, eval_inputs):
     # inputs = {'images': images, 'labels': labels, 'iterator_init_op': iterator_init_op}
 
     # Training Variables
-    data = train_inputs['images']
+    data = train_img
     print(data)
-    label_y = train_inputs['labels']
+    label_y = train_labels
     print(label_y)
     data_x = []
     # TODO: update following
@@ -78,9 +127,9 @@ def RNN_model(params, train_inputs, eval_inputs):
     four = 0
 
     # Testing Variables
-    test_data = eval_inputs['images']
+    test_data = eval_img
     test_x = []
-    test_label = []
+    test_label = eval_labels
     n_test = 120 # TODO: update as len(test_data)
     accuracy_counter = 0
     # TODO: update following

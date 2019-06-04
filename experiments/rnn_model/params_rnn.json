@@ -4,9 +4,9 @@
     "training_iterations": 5,
     "num_outputs": 5,
 
-    "batch_size",: 32,
+    "batch_size": 32,
 
-    "num_timesteps": 40,
+    "num_timesteps": 5,
     "n_input": 625,
 
     "image_size": 64,
