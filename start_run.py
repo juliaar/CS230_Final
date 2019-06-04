@@ -4,13 +4,13 @@ import cv2
 import os
 import argparse
 import logging
-import tensorflow as tf
 from PIL import Image
-from model.model_setup import model_def
 from model.utilities import Params
 from model.utilities import set_logger
-from model.model_setup import build_model
 from classification_defs import sample_def
+
+gestures = [23, 52, 53]
+gesture_name = ["Frame", "Applaud", "Heart"]
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_dir', default='experiments/test',
@@ -19,7 +19,6 @@ parser.add_argument('--restore_from', default='best_weights',
                     help="Subdirectory of model dir or file containing the weights")
 
 zeros = 5
-
 
 def getFrame(count, zeros):
   size = 64
@@ -101,9 +100,18 @@ if __name__ == '__main__':
 
         if (totcount % 10) == 0:
             files = [f for f in os.listdir('.') if f.endswith('.jpg')]
+            #
             prediction = sample_def(files, params)
             print("prediction:")
-            print(prediction)
+            if prediction == 23:
+                print(gesture_name[gestures.index(prediction)])
+            elif prediction == 52:
+                print(gesture_name[gestures.index(prediction)])
+            elif prediction == 53:
+                print(gesture_name[gestures.index(prediction)])
+            else:
+                print(prediction)
+            #
             # Prepare for the next run through
             count = count + 1
             # Only want to store 5 images
@@ -112,7 +120,7 @@ if __name__ == '__main__':
             getFrame(count, zeros)
 
         # Don't want to run for too long while testing, delete when ready
-        if totcount == 200:
+        if totcount == 500:
           break
 
         totcount = totcount + 1
