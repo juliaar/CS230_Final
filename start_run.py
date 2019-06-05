@@ -9,8 +9,8 @@ from model.utilities import Params
 from model.utilities import set_logger
 from classification_defs import sample_def
 
-gestures = [23, 52, 53]
-gesture_name = ["Frame", "Applaud", "Heart"]
+gestures = [0, 23, 52, 53]
+gesture_name = ["Nothing", "Frame", "Applaud", "Heart"]
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_dir', default='experiments/test',
@@ -103,14 +103,7 @@ if __name__ == '__main__':
             #
             prediction = sample_def(files, params)
             print("prediction:")
-            if prediction == 23:
-                print(gesture_name[gestures.index(prediction)])
-            elif prediction == 52:
-                print(gesture_name[gestures.index(prediction)])
-            elif prediction == 53:
-                print(gesture_name[gestures.index(prediction)])
-            else:
-                print(prediction)
+            print(gesture_name[gestures.index(prediction)])
             #
             # Prepare for the next run through
             count = count + 1
@@ -120,7 +113,7 @@ if __name__ == '__main__':
             getFrame(count, zeros)
 
         # Don't want to run for too long while testing, delete when ready
-        if totcount == 500:
+        if totcount == 200:
           break
 
         totcount = totcount + 1
