@@ -39,7 +39,6 @@ def build_model(is_training, inputs, params):
         out = tf.nn.relu(out)
     with tf.variable_scope('fc_2'):
         logits = tf.layers.dense(out, params.num_labels)
-        print(params.num_labels)
 
     return logits
 

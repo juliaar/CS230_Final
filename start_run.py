@@ -9,8 +9,8 @@ from model.utilities import Params
 from model.utilities import set_logger
 from classification_defs import sample_def
 
-gestures = [0, 23, 52, 53]
-gesture_name = ["Nothing", "Frame", "Applaud", "Heart"]
+gestures = [0, 1, 2, 23, 36, 48, 52, 53, 61, 62, 63]
+gesture_name = ["Nothing", "Scroll right", "Scroll left", "Frame", "Pause", "Grasp", "Applaud", "Heart", "Closer", "Push", "Thumbs up"]
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_dir', default='experiments/test',
@@ -113,7 +113,7 @@ if __name__ == '__main__':
             getFrame(count, zeros)
 
         # Don't want to run for too long while testing, delete when ready
-        if totcount == 200:
+        if totcount == 1000:
           break
 
         totcount = totcount + 1

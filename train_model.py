@@ -7,15 +7,13 @@
 import argparse
 import logging
 import os
-import random
 import tensorflow as tf
 
 from model.input_data import input_def
-from model.utilities import Params
-from model.utilities import set_logger
-from model.utilities import save_dict_to_json
 from model.model_setup import model_def
 from model.training_defs import train_and_evaluate
+from model.utilities import Params
+from model.utilities import set_logger
 from model.utilities import splitter
 
 

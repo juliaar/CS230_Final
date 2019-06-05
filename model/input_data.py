@@ -58,8 +58,6 @@ def input_def(is_training, filenames, labels, params):
         im_i, _ = _parse_function(filenames[i], labels[i], params.image_size)
         images.append(im_i)
 
-    print(images)
-
     num_samples = len(filenames)
     if is_training:
         dataset = tf.data.Dataset.from_tensor_slices((images, labels))
