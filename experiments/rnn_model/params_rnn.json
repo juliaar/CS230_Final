@@ -1,7 +1,7 @@
 {
     "learning_rate": 1e-4,
     "num_layers": 1,
-    "training_iterations": 200,
+    "training_iterations": 550,
     "num_outputs": 5,
 
     "batch_size": 32,

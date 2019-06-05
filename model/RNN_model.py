@@ -1,9 +1,5 @@
 
-import os
-import numpy as np
-import tensorflow as tf
 from tensorflow.contrib import rnn
-import argparse
 import cv2
 import tensorflow as tf
 import numpy as np
