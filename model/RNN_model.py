@@ -11,24 +11,21 @@ import numpy as np
 def _parse_function(filename):
     """ Obtain the image from the filename. """
 
+    resized_image_k = []
+
     for k in range(len(filename)):
 
         # Read image in BGR format
         image = cv2.imread(filename[k])
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # BGR -> RGB
 
-        if k == 0:
-            resized_image = image.flatten()
-            print(resized_image)
-            print(resized_image.shape)
-        else:
-            resized_image_k = image.flatten()
-            resized_image = tf.stack([resized_image, resized_image_k])
+        resized_image_k.append(image.flatten())
 
-    # outputs resizes image with shape (64,64,15) & its label
+    resized_image = tf.stack([resized_image_k[0], resized_image_k[1], resized_image_k[2], resized_image_k[3], resized_image_k[4],])
+
     return resized_image
 
-def _input_def(filenames, labels, size):
+def _input_def(filenames, labels):
     """Input function for the EgoGesture dataset.
 
     The filenames have format "{class label}_{part number (0-4)}_{total example number}.jpg".
@@ -39,17 +36,37 @@ def _input_def(filenames, labels, size):
                      At training, we shuffle the data and have multiple epochs
         filenames: (list) filenames of the images (5 images together)
         labels: (list) corresponding list of labels
-        params: (Params) contains hyperparameters of the model (ex: `params.num_epochs`)
+        params: (Params) contains hyperparameters of the model (ex: `params.image_size`)
     """
 
     assert len(filenames) == len(labels), "Filenames and labels should have same length"
-
     images = []
     for i in range(len(filenames)):
-        im_i, _ = _parse_function(filenames[i], size)
+        im_i = _parse_function(filenames[i])
         images.append(im_i)
 
     return images
+
+def convert_to_one_hot(vector, num_classes=None):
+    """
+    Converts an input 1-D vector of integers into an output
+    2-D array of one-hot vectors, where an i'th input value
+    of j will set a '1' in the i'th row, j'th column of the
+    output array.
+    """
+
+    assert isinstance(vector, np.ndarray)
+    assert len(vector) > 0
+
+    if num_classes is None:
+        num_classes = np.max(vector)+1
+    else:
+        assert num_classes > 0
+        assert num_classes >= np.max(vector)
+
+    result = np.zeros(shape=(len(vector), num_classes))
+    result[np.arange(len(vector)), vector] = 1
+    return result.astype(int)
 
 def RNN_def(x, weights, biases, n_timesteps, n_hidden, n_layers, training):
 
@@ -71,8 +88,8 @@ def RNN_def(x, weights, biases, n_timesteps, n_hidden, n_layers, training):
 def RNN_model(params, train_filenames, train_labels, eval_filenames, eval_labels):
 
     print("Decoding images ...")
-    train_img = _input_def(train_filenames, train_labels, params.image_size)
-    eval_img = _input_def(eval_filenames, eval_labels, params.image_size)
+    train_img = _input_def(train_filenames, train_labels)
+    eval_img = _input_def(eval_filenames, eval_labels)
 
     # Parameters
     n_classes = params.num_labels
@@ -82,8 +99,7 @@ def RNN_model(params, train_filenames, train_labels, eval_filenames, eval_labels
     n_layers = params.num_layers  # number of LSTM layers
     n_hidden = params.num_hidden  # number of hidden layers / cells in each LSTM layer
 
-    # TODO: UPDATE
-    n_input = params.num_input  # data is (img feature shape : 625 descriptors * 40 frames)
+    n_input = 3 * params.image_size * params.image_size
     n_timesteps = params.num_timesteps  # timesteps = frames
 
     # tf Graph input
@@ -111,33 +127,20 @@ def RNN_model(params, train_filenames, train_labels, eval_filenames, eval_labels
     # Initializing the variables
     init = tf.global_variables_initializer()
 
-    # train_inputs, eval_inputs
-    # inputs = {'images': images, 'labels': labels, 'iterator_init_op': iterator_init_op}
-
     # Training Variables
     data = train_img
-    print(data)
-    label_y = train_labels
-    print(label_y)
+    data_labels = convert_to_one_hot(np.array(train_labels), n_classes)
     data_x = []
-    # TODO: update following
-    one = 0
-    two = 0
-    three = 0
-    four = 0
+    label_y = []
 
     # Testing Variables
     test_data = eval_img
+    test_labels = convert_to_one_hot(np.array(eval_labels), n_classes)
     test_x = []
-    test_label = eval_labels
-    n_test = 120 # TODO: update as len(test_data)
+    n_test = len(eval_labels)
     accuracy_counter = 0
-    # TODO: update following
-    One = 0
-    Two = 0
-    Three = 0
-    Four = 0
 
+    print("Starting to train ...")
     with tf.Session() as sess:
         sess.run(init)
 
@@ -146,34 +149,20 @@ def RNN_model(params, train_filenames, train_labels, eval_filenames, eval_labels
             for n in range(batch_size):
 
                 rand_n = np.random.random_integers(0, len(data) - 1)
-                # print rand_n
-                data_x.append(data[rand_n, :, :])
-
-                if (0 <= rand_n <= 119):
-                    label_y.append([1, 0, 0, 0])
-                    one += 1
-
-                elif (120 <= rand_n <= 239):
-                    label_y.append([0, 1, 0, 0])
-                    two += 1
-
-                elif (240 <= rand_n <= 359):
-                    label_y.append([0, 0, 1, 0])
-                    three += 1
-
-                elif (360 <= rand_n <= 479):
-                    label_y.append([0, 0, 0, 1])
-                    four += 1
+                tensor_n = data[rand_n]
+                array_n = tensor_n.eval()
+                data_x.append(array_n)
+                label_y.append(data_labels[rand_n, :])
 
             batch_x = np.array(data_x)
-
             batch_y = np.array(label_y)
+
             batch_x = batch_x.reshape((batch_size, n_timesteps, n_input))
             batch_y = batch_y.reshape((batch_size, n_classes))
 
             sess.run(optimizer, feed_dict={x: batch_x, y: batch_y})
 
-            if (i % 100) == 0:
+            if (i % 50) == 0:
                 # Calculate batch accuracy
                 acc = sess.run(accuracy, feed_dict={x: batch_x, y: batch_y})
 
@@ -186,29 +175,14 @@ def RNN_model(params, train_filenames, train_labels, eval_filenames, eval_labels
             del data_x[:]
             del label_y[:]
 
-        print(test_data.shape)
         # Testing Loop
         for i in range(n_test):
-            test_x.append(test_data[i, :, :])
-
-            if (0 <= i <= 29):
-                label_y.append([1, 0, 0, 0])
-                One += 1
-
-            elif (30 <= i <= 59):
-                label_y.append([0, 1, 0, 0])
-                Two += 1
-
-            elif (60 <= i <= 89):
-                label_y.append([0, 0, 1, 0])
-                Three += 1
-
-            elif (90 <= i <= 119):
-                label_y.append([0, 0, 0, 1])
-                Four += 1
+            tensor_i = test_data[i]
+            array_i = tensor_i.eval()
+            test_x.append(array_i)
 
             batch_x = np.array(test_x)
-            batch_y = np.array(label_y)
+            batch_y = np.array(test_labels)
             batch_x = batch_x.reshape((1, n_timesteps, n_input))
 
             # Calculate batch accuracy
@@ -217,10 +191,8 @@ def RNN_model(params, train_filenames, train_labels, eval_filenames, eval_labels
             if acc != 0.0:
                 accuracy_counter = accuracy_counter + 1
 
-            print("Testing Accuracy:", acc)
-            # print("The accuracy for testing per 4 iterations of each training sample is --  " +  "{:.5f}".format(a))
-
-            print("Testing of class", i)
+            #print("Testing Accuracy:", acc)
+            #print("Testing of sample", i)
 
             del test_x[:]
             del label_y[:]

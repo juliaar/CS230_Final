@@ -1,30 +1,15 @@
 {
     "learning_rate": 1e-4,
     "num_layers": 1,
-    "training_iterations": 5,
+    "training_iterations": 200,
     "num_outputs": 5,
 
     "batch_size": 32,
 
     "num_timesteps": 5,
-    "n_input": 625,
 
     "image_size": 64,
     "num_labels": 84,
 
-    "num_hidden": 5,
-
-
-
-    "num_epochs": 12,
-
-    "num_channels": 16,
-    "use_batch_norm": true,
-    "bn_momentum": 0.9,
-
-
-    "use_random_flip": true,
-
-    "num_parallel_calls": 4,
-    "save_summary_steps": 1
+    "num_hidden": 5
 }
