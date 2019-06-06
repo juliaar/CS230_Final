@@ -13,7 +13,6 @@ from keras.optimizers import Adam
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping, CSVLogger
 from keras.preprocessing.image import img_to_array, load_img
 from keras.utils import to_categorical
-import pickle
 
 
 def add_default_block(model, filters, init, reg_lambda):
@@ -121,26 +120,26 @@ def train_LRCN_model(params, train_filenames, train_labels, eval_filenames, eval
     batch_size = params.batch_size
     img_size = params.image_size
     n_timesteps = params.num_timesteps  # timesteps = frames
-    val_steps = params.validation_steps
+    early_stop = params.early_stop
 
-    # Helper: Save the model.
+    # Save the model.
     checkpointer = ModelCheckpoint(
-        filepath=os.path.join('data', 'checkpoints', 'lrcn-images.{epoch:03d}-{val_loss:.3f}.hdf5'),
+        filepath=os.path.join('lrcn_data', 'checkpoints', 'lrcn-images.{epoch:03d}-{val_loss:.3f}.hdf5'),
         verbose=1,
         save_best_only=True)
 
-    # Helper: TensorBoard
-    tb = TensorBoard(log_dir=os.path.join('data', 'logs', 'lrcn'))
+    # TensorBoard
+    tb = TensorBoard(log_dir=os.path.join('lrcn_data', 'logs', 'lrcn'))
 
-    # Helper: Stop when we stop learning.
-    early_stopper = EarlyStopping(patience=5)
+    # Stop when we stop learning.
+    early_stopper = EarlyStopping(patience=early_stop)
+    # patience = number of epochs before stopping once the loss starts to increase or stops improving
+    # make it higher for higher learning rate (more zig-zag) and vice versa
 
-    # Helper: Save results.
+    # Save results.
     timestamp = time.time()
-    csv_logger = CSVLogger(os.path.join('data', 'logs', 'lrcn-training-' + str(timestamp) + '.log'))
+    csv_logger = CSVLogger(os.path.join('lrcn_data', 'logs', 'lrcn-training-' + str(timestamp) + '.log'))
 
-    # Get samples per epoch.
-    steps_per_epoch = len(train_labels) // batch_size
 
     # Get generators.
     generator = convert_to_array(train_filenames, train_labels, batch_size, img_size, n_classes)
@@ -156,6 +155,9 @@ def train_LRCN_model(params, train_filenames, train_labels, eval_filenames, eval
 
     print(lrcn_model.summary())
 
+    # Get samples per epoch.
+    steps_per_epoch = len(train_labels) // batch_size  # Would be automatically this anyway
+    val_steps = len(eval_labels) // batch_size
 
     print("~~~~ going on to fitting!! ~~~~")
     # Fit! Use fit generator.
@@ -169,4 +171,5 @@ def train_LRCN_model(params, train_filenames, train_labels, eval_filenames, eval
         validation_steps=val_steps,
         workers=1,
         use_multiprocessing=False)
+    # where verbose mode: 0 = silent, 1 = progress bar, 2 = one line per epoch
 

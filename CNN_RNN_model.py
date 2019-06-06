@@ -1,4 +1,5 @@
 # python CNN_RNN_model.py --data_dir "D:\CS230-Datasets\EgoGesture\\64x64_gestures" --model_dir "C:\Users\Julia Arnardottir\PycharmProjects\CS230_Final\experiments\\lrcn_model"
+# tensorboard --logdir="C:\Users\Julia Arnardottir\PycharmProjects\CS230_Final\lrcn_data\logs"
 
 import os.path
 import argparse
