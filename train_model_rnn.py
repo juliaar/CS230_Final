@@ -1,5 +1,5 @@
 ''' To call (Train the model): '''
-#python train_model_rnn.py --data_dir "D:\CS230-Datasets\EgoGesture\\64x64_gestures" --model_dir "C:\Users\Julia Arnardottir\PycharmProjects\CS230_Final\experiments\\rnn_model"
+# python train_model_rnn.py --data_dir "D:\CS230-Datasets\EgoGesture\\64x64_gestures" --model_dir "C:\Users\Julia Arnardottir\PycharmProjects\CS230_Final\experiments\\rnn_model"
 
 
 import argparse
@@ -7,7 +7,6 @@ import logging
 import os
 import tensorflow as tf
 
-from model.input_data import input_def
 from model.utilities import Params
 from model.utilities import set_logger
 from model.utilities import splitter
@@ -24,7 +23,7 @@ parser.add_argument('--restore_from', default=None,
 
 
 if __name__ == '__main__':
-    # Set the random seed for the whole graph for reproductible experiments
+    # Set the random seed for the whole graph for reproducible experiments
     tf.set_random_seed(230)
 
     # Load the parameters from json file
@@ -72,12 +71,7 @@ if __name__ == '__main__':
         eval_labels.append(int(eval_filenames[count][1].split(splitter)[-1][:2]))
         count += 1
 
-    # Specify the sizes of the dataset we train on and evaluate on
-    params.train_size = len(train_filenames)
-    params.eval_size = len(eval_filenames)
-
     # Define the model
     logging.info("Creating and evaluating the RNN model...")
     RNN_model(params, train_filenames, train_labels, eval_filenames, eval_labels)
-
 
