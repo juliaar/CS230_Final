@@ -31,7 +31,7 @@ def add_default_block(model, filters, init, reg_lambda):
 
     return model
 
-def lrcn(input_shape, n_classes):
+def lrcn(input_shape, n_classes, n_cnnlayers, LSTM_keep_prop, LSTM_units):
     """ Build a CNN into RNN.
     Based on: https://github.com/harvitronix/five-video-classification-methods/blob/master/models.py
     """
@@ -43,7 +43,7 @@ def lrcn(input_shape, n_classes):
 
     # ~~ CONV2D ~~
 
-    # first (non-default) block
+    # first (non-default) double-layer block
     model.add(TimeDistributed(Conv2D(32, (7, 7), strides=(2, 2), padding='same',
                                      kernel_initializer=initialiser,
                                      kernel_regularizer=tf.keras.regularizers.l2(reg_lambda)),
@@ -56,17 +56,19 @@ def lrcn(input_shape, n_classes):
     model.add(TimeDistributed(Activation('relu')))
     model.add(TimeDistributed(MaxPooling2D((2, 2), strides=(2, 2))))
 
-    # 2nd-5th (default) blocks
-    model = add_default_block(model, 64, init=initialiser, reg_lambda=reg_lambda)
-    model = add_default_block(model, 128, init=initialiser, reg_lambda=reg_lambda)
-    model = add_default_block(model, 256, init=initialiser, reg_lambda=reg_lambda)
-    model = add_default_block(model, 512, init=initialiser, reg_lambda=reg_lambda)
+    # 2nd-5th (default) double-layer blocks
+    layers = 2
+    filters = 32
+    while layers < n_cnnlayers:
+        filters = filters*2
+        model = add_default_block(model, filters, init=initialiser, reg_lambda=reg_lambda)
+        layers = layers + 2
 
     # ~~ LSTM ~~
 
     # LSTM output head
     model.add(TimeDistributed(Flatten()))
-    model.add(LSTM(256, return_sequences=False, dropout=0.5))
+    model.add(LSTM(LSTM_units, return_sequences=False, dropout=LSTM_keep_prop))
     model.add(Dense(n_classes, activation='softmax'))
 
     return model
@@ -121,6 +123,9 @@ def train_LRCN_model(params, train_filenames, train_labels, eval_filenames, eval
     img_size = params.image_size
     n_timesteps = params.num_timesteps  # timesteps = frames
     early_stop = params.early_stop
+    n_cnnlayers = params.num_cnn_layers  # 2, 4, 6, 8, or 10 only (otherwise just to big for how this is built)
+    LSTM_keep_prop = params.LSTM_keep_prop
+    LSTM_units = params.LSTM_units
 
     # Save the model.
     checkpointer = ModelCheckpoint(
@@ -147,7 +152,7 @@ def train_LRCN_model(params, train_filenames, train_labels, eval_filenames, eval
 
     # Get the CNN-LSTM model.
     input_shape = (n_timesteps, img_size, img_size, 3)
-    lrcn_model = lrcn(input_shape, n_classes)
+    lrcn_model = lrcn(input_shape, n_classes, n_cnnlayers, LSTM_keep_prop, LSTM_units)
 
     # Compile the network.
     optimizer = Adam(lr=learning_rate, decay=learning_decay)

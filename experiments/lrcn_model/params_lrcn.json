@@ -1,13 +1,16 @@
 {
-    "learning_rate": 1e-4,
+    "learning_rate": 1e-3,
     "decay": 1e-6,
 
     "num_labels": 84,
     "image_size": 64,
     "num_timesteps": 5,
 
-    "num_epochs": 12,
+    "num_epochs": 10,
     "batch_size": 16,
+    "num_cnn_layers": 6,
+    "LSTM_keep_prop": 0.5,
+    "LSTM_units": 256,
 
     "early_stop": 2
 }
