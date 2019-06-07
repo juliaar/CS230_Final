@@ -1,9 +1,10 @@
 # python start_run.py --model_dir "C:\Users\Julia Arnardottir\PycharmProjects\VisionExample\experiments\base_model"
-
+#
 import cv2
 import os
 import argparse
 import logging
+import pyautogui
 from PIL import Image
 from model.utilities import Params
 from model.utilities import set_logger
@@ -19,6 +20,32 @@ parser.add_argument('--restore_from', default='best_weights',
                     help="Subdirectory of model dir or file containing the weights")
 
 zeros = 5
+
+def perform_animation(prediction):
+    ''' Motion Project.exe must be open.
+    This function gives a command like that of pressing different numbers on the keyboard, based on the prediction.
+    The 3D animated character in 'Motion Project' does different movements based on the predictions.
+    Keys pressed while movement is in progress are ignored.'''
+    if prediction == 1:
+        pyautogui.press('1')
+    elif prediction == 2:
+        pyautogui.press('2')
+    elif prediction == 23:
+        pyautogui.press('3')
+    elif prediction == 36:
+        pyautogui.press('4')
+    elif prediction == 48:
+        pyautogui.press('5')
+    elif prediction == 52:
+        pyautogui.press('6')
+    elif prediction == 53:
+        pyautogui.press('7')
+    elif prediction == 61:
+        pyautogui.press('8')
+    elif prediction == 62:
+        pyautogui.press('9')
+    elif prediction == 63:
+        pyautogui.press('0')
 
 def getFrame(count, zeros):
   size = 64
@@ -102,8 +129,8 @@ if __name__ == '__main__':
             files = [f for f in os.listdir('.') if f.endswith('.jpg')]
             #
             prediction = sample_def(files, params)
-            print("prediction:")
-            print(gesture_name[gestures.index(prediction)])
+            #print("prediction:")
+            #print(gesture_name[gestures.index(prediction)])
             #
             # Prepare for the next run through
             count = count + 1
@@ -111,6 +138,9 @@ if __name__ == '__main__':
             remove_img(count, zeros)
             # Save frame
             getFrame(count, zeros)
+
+            if prediction != 0:
+                perform_animation(prediction)
 
         # Don't want to run for too long while testing, delete when ready
         if totcount == 1000:

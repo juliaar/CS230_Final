@@ -1,5 +1,5 @@
 ''' To call: '''
-#python define_dataset.py --data_dir "D:\CS230-Datasets\EgoGesture" --output_dir "D:\CS230-Datasets\EgoGesture\64x64_gestures"
+# python define_dataset.py --data_dir "D:\CS230-Datasets\EgoGesture" --output_dir "D:\CS230-Datasets\EgoGesture\64x64_gestures"
 
 
 import argparse
@@ -7,10 +7,10 @@ import os
 from model.ourdata_defs import get_data_and_save
 
 SIZE = 64
-#gestures = [0, 1, 2, 23, 36, 48, 52, 53, 61, 62, 63]
-gestures = [0, 23, 52]
-percent_dev = 10
-percent_test = 10
+gestures = [0, 1, 2, 23, 36, 48, 52, 53, 61, 62, 63]
+#gestures = [0, 23, 52, 53]
+percent_dev = 20
+percent_test = 0
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', default='D:\\CS230-Datasets\\EgoGesture', help="Directory with the EgoGesture dataset")

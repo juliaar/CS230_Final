@@ -31,7 +31,7 @@ def add_default_block(model, filters, init, reg_lambda):
 
     return model
 
-def lrcn(input_shape, n_classes, n_cnnlayers, LSTM_keep_prop, LSTM_units):
+def lrcn(input_shape, n_classes, n_cnnlayers, LSTM_dropout, LSTM_units):
     """ Build a CNN into RNN.
     Based on: https://github.com/harvitronix/five-video-classification-methods/blob/master/models.py
     """
@@ -68,7 +68,7 @@ def lrcn(input_shape, n_classes, n_cnnlayers, LSTM_keep_prop, LSTM_units):
 
     # LSTM output head
     model.add(TimeDistributed(Flatten()))
-    model.add(LSTM(LSTM_units, return_sequences=False, dropout=LSTM_keep_prop))
+    model.add(LSTM(LSTM_units, return_sequences=False, dropout=LSTM_dropout))
     model.add(Dense(n_classes, activation='softmax'))
 
     return model
@@ -124,8 +124,10 @@ def train_LRCN_model(params, train_filenames, train_labels, eval_filenames, eval
     n_timesteps = params.num_timesteps  # timesteps = frames
     early_stop = params.early_stop
     n_cnnlayers = params.num_cnn_layers  # 2, 4, 6, 8, or 10 only (otherwise just to big for how this is built)
-    LSTM_keep_prop = params.LSTM_keep_prop
+    LSTM_dropout = params.LSTM_dropout
     LSTM_units = params.LSTM_units
+    beta_1 = params.beta_1
+    beta_2 = params.beta_2
 
     # Save the model.
     checkpointer = ModelCheckpoint(
@@ -152,10 +154,10 @@ def train_LRCN_model(params, train_filenames, train_labels, eval_filenames, eval
 
     # Get the CNN-LSTM model.
     input_shape = (n_timesteps, img_size, img_size, 3)
-    lrcn_model = lrcn(input_shape, n_classes, n_cnnlayers, LSTM_keep_prop, LSTM_units)
+    lrcn_model = lrcn(input_shape, n_classes, n_cnnlayers, LSTM_dropout, LSTM_units)
 
     # Compile the network.
-    optimizer = Adam(lr=learning_rate, decay=learning_decay)
+    optimizer = Adam(lr=learning_rate, decay=learning_decay, beta_1=beta_1, beta_2=beta_2)
     lrcn_model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     print(lrcn_model.summary())
@@ -166,6 +168,7 @@ def train_LRCN_model(params, train_filenames, train_labels, eval_filenames, eval
 
     print("~~~~ going on to fitting!! ~~~~")
     # Fit! Use fit generator.
+    # where verbose mode: 0 = silent, 1 = progress bar, 2 = one line per epoch
     lrcn_model.model.fit_generator(
         generator=generator,
         steps_per_epoch=steps_per_epoch,
@@ -176,5 +179,4 @@ def train_LRCN_model(params, train_filenames, train_labels, eval_filenames, eval
         validation_steps=val_steps,
         workers=1,
         use_multiprocessing=False)
-    # where verbose mode: 0 = silent, 1 = progress bar, 2 = one line per epoch
 
