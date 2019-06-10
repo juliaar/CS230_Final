@@ -8,7 +8,7 @@ from model.ourdata_defs import get_data_and_save
 
 SIZE = 64
 gestures = [0, 1, 2, 23, 36, 48, 52, 53, 61, 62, 63]
-#gestures = [0, 23, 52, 53]
+# gestures = [0, 23, 36, 48, 52, 53]
 percent_dev = 20
 percent_test = 0
 

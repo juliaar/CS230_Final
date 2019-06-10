@@ -1,7 +1,7 @@
 ''' To call (Train the model): '''
 #python train_model.py --data_dir "D:\CS230-Datasets\EgoGesture\\64x64_gestures" --model_dir "C:\Users\Julia Arnardottir\PycharmProjects\CS230_Final\experiments\\base_model"
 #tensorboard --logdir="C:\Users\Julia Arnardottir\PycharmProjects\CS230_Final\experiments\\base_model\train_summaries" --port 6006
-#C:\Users\Julia Arnardottir\PycharmProjects\CS230_Final\experiments\base_model\train_summaries>tensorboard --logdir="C:\Users\Julia Arnardottir\PycharmProjects\CS230_Final\experiments\base_model\train_summaries" --port 6006
+#tensorboard --logdir="C:\Users\Julia Arnardottir\PycharmProjects\CS230_Final\experiments\base_model\train_summaries" --port 6006
 
 
 import argparse
